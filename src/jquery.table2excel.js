@@ -26,14 +26,19 @@
 				e.template += "<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions>";
 				e.template += "<x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>";
 				e.tableRows = "";
-
-				// get contents of table except for exclude
-				$(e.element).find("tr").not(this.settings.exclude).each(function (i,o) {
+                               // get contents of table except for exclude
+			    var exclude_selector = this.settings.exclude;
+			    var clonetable = $(e.element).clone();
+			    clonetable.find("tr").not(this.settings.exclude).each(function (i,o) {
+				$(o).find(exclude_selector).each(function () {
+				    this.remove(); // "this" is the current element in the loop, the current item matching the exclude-selector
+				})
 					e.tableRows += "<tr>" + $(o).html() + "</tr>";
-				});
-				this.tableToExcel(this.tableRows, this.settings.name);
+			    });
+			    
+			    this.tableToExcel(this.tableRows, this.settings.name);
 			},
-			tableToExcel: function (table, name) {
+		    tableToExcel: function (table, name) {
 				var e = this;
 				e.uri = "data:application/vnd.ms-excel;base64,";
 				e.base64 = function (s) {
@@ -64,3 +69,4 @@
 		};
 
 })( jQuery, window, document );
+
